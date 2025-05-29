@@ -40,9 +40,8 @@
                                     <label for="busca_produto" class="col-lg-2 col-form-label text-lg-end">{{ __('Produto') }}</label>
                                     <div class="col-lg-10 search-wrapper">
                                         <input type="text" class="form-control" id="busca_produto" placeholder="Digite para buscar produto" autocomplete="off">
-                                        {{-- Dropdown de produtos --}}
                                         <div id="lista_resultados_produtos" class="list-group autocomplete-results position-absolute" style="display:none;">
-                                            {{-- Conteúdo gerado por JavaScript --}}
+
                                         </div>
                                     </div>
                                 </div>
@@ -70,7 +69,6 @@
                                
                                 @php
                                     $_formaPagamentoChecked = old('forma_pagamento', 'avista'); 
-
                                     $_numeroParcelasSelected = (int)old('numero_parcelas_select', 1); 
                                 @endphp
 

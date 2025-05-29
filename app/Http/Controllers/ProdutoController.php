@@ -34,7 +34,7 @@ class ProdutoController extends Controller
             return redirect()->route('produtos.index')
                              ->with('success', 'Produto cadastrado com sucesso!');
         } catch (\Exception $e) {
-            Log::error('Erro ao cadastrar produto: ' . $e->getMessage()); // Linha de log descomentada e ajustada
+            Log::error('Erro ao cadastrar produto: ' . $e->getMessage());  
             return redirect()->route('produtos.create')
                              ->with('error', 'Erro ao cadastrar o produto. Tente novamente.');
         }

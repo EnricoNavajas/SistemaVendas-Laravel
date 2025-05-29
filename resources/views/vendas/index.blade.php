@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-12"> {{-- Aumentei para col-md-12 para melhor acomodar a nova coluna --}}
+        <div class="col-md-12"> 
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
@@ -31,7 +31,7 @@
                                         <th scope="col" class="text-end">Total (R$)</th>
                                         <th scope="col">Pagamento</th>
                                         <th scope="col" class="text-center">Ações</th>
-                                        <th scope="col" class="text-center">Relatório</th> {{-- Nova Coluna --}}
+                                        <th scope="col" class="text-center">Relatório</th> 
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -43,7 +43,7 @@
                                         <td>{{ $venda->funcionario->nome ?? 'N/A' }}</td>
                                         <td class="text-end">{{ number_format($venda->total, 2, ',', '.') }}</td>
                                         <td>{{ ucfirst($venda->forma_pagamento) }}</td>
-                                        <td class="text-center" style="min-width: 160px;"> {{-- Aumentei um pouco o min-width --}}
+                                        <td class="text-center" style="min-width: 160px;"> 
                                             <a href="{{ route('vendas.edit', $venda->id) }}" class="btn btn-sm btn-info me-1" title="Editar Venda">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </a>
@@ -58,8 +58,7 @@
                                                 @method('DELETE')
                                             </form>
                                         </td>
-                                        <td class="text-center"> {{-- Novo Botão PDF --}}
-                                            {{-- A rota 'vendas.gerarPdf' é um exemplo, precisaremos criá-la --}}
+                                        <td class="text-center"> 
                                             <a href="{{ route('vendas.gerarPdf', $venda->id) }}" class="btn btn-sm btn-secondary" title="Gerar PDF da Venda" target="_blank">
                                                 <i class="bi bi-file-earmark-pdf"></i> PDF
                                             </a>

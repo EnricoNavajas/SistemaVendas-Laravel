@@ -362,21 +362,17 @@ $(document).ready(function() {
 
     function calcularTotalVenda() {
         totalVenda = 0; 
-        // console.log("Recalculando total. itensVenda no início:", JSON.parse(JSON.stringify(itensVenda)));
 
         itensVenda.forEach(function(item, index) { 
             let qtd = parseFloat(item.quantidade) || 0;
             let preco = parseFloat(item.preco) || 0;
-            // console.log(`Item ${index} (ID: ${item.id}): Qtd_original=${item.quantidade}, Preco_original=${item.preco}, Qtd_parseada=${qtd}, Preco_parseado=${preco}, Subtotal_calculado=${qtd * preco}`);
             totalVenda += qtd * preco;
         });
 
-        // console.log("Total da Venda recalculado:", totalVenda); 
+         
         $('#display_total_venda').text(formatarMoeda(totalVenda));
 
         if (inicializacaoCompleta && radioParcelado.is(':checked')) {
-            // Se o total da venda mudou E o pagamento é parcelado E a inicialização já ocorreu,
-            // é preciso recalcular/redistribuir os valores das parcelas.
             gerarCamposParcelas(); 
         }
         atualizarEstadoBotaoFinalizar(); 
@@ -411,17 +407,16 @@ $(document).ready(function() {
     function toggleParcelamento() {
         if (radioParcelado.is(':checked')) {
             detalhesParcelamentoDiv.show();
-            if (inicializacaoCompleta) { // Só gera se não for a inicialização, ou se na inicialização não foram renderizadas pelo Blade
-                // Se não há campos de parcelas e o total é > 0, ou se já há campos e o usuário está apenas trocando de "à vista" para "parcelado"
+            if (inicializacaoCompleta) { 
                  if ($('#campos_parcelas_editaveis .parcela-item').length === 0 && totalVenda > 0) {
                     gerarCamposParcelas();
                 } else {
-                     // Se já existem campos (renderizados pelo Blade ou JS), recalcula/verifica
-                    verificarSomaParcelas(); // Para o caso de já ter campos e só estar re-exibindo
+                     
+                    verificarSomaParcelas(); 
                     if (totalVenda > 0 && $('#campos_parcelas_editaveis .parcela-item').length === 0) {
-                        gerarCamposParcelas(); // Se limpou e precisa gerar de novo
+                        gerarCamposParcelas(); 
                     } else if (totalVenda > 0) {
-                        // Apenas atualiza a info se já existem parcelas e o número está correto
+                        
                         let numParcelasAtual = $('#campos_parcelas_editaveis .parcela-item').length;
                         if (numParcelasAtual > 0) {
                              let valorParcelaBase = totalVenda / numParcelasAtual;
@@ -432,10 +427,6 @@ $(document).ready(function() {
             }
         } else { 
             detalhesParcelamentoDiv.hide();
-            // Não limpar os campos aqui, pois o usuário pode voltar para parcelado e querer os valores anteriores.
-            // Apenas esconde e o backend não processará as parcelas se forma_pagamento não for 'parcelado'.
-            // camposParcelasDiv.empty(); 
-            // infoValorParcelasDiv.empty();
             avisoSomaParcelasDiv.hide();
         }
         if (inicializacaoCompleta) atualizarEstadoBotaoFinalizar();
@@ -444,20 +435,18 @@ $(document).ready(function() {
     
     numeroParcelasSelect.on('change', function() {
         if (radioParcelado.is(':checked')) { 
-            gerarCamposParcelas(); // Mudar o número de parcelas sempre recria os campos
+            gerarCamposParcelas(); 
         }
     });
 
     function gerarCamposParcelas() {
-        if (!radioParcelado.is(':checked')) { // Segurança extra
+        if (!radioParcelado.is(':checked')) { 
             detalhesParcelamentoDiv.hide(); 
-            // camposParcelasDiv.empty(); // Melhor não limpar aqui também, por consistência com toggleParcelamento
-            // infoValorParcelasDiv.empty();
             avisoSomaParcelasDiv.hide();
             if(inicializacaoCompleta) atualizarEstadoBotaoFinalizar();
             return;
         }
-        detalhesParcelamentoDiv.show(); // Garante que está visível
+        detalhesParcelamentoDiv.show(); 
 
         if (totalVenda <= 0) {
             camposParcelasDiv.empty().html('<p class="text-muted small">Adicione itens à venda para definir parcelas.</p>');
@@ -468,7 +457,7 @@ $(document).ready(function() {
         }
 
         let numParcelas = parseInt(numeroParcelasSelect.val()) || 1;
-        camposParcelasDiv.empty(); // Limpa apenas quando vai gerar novos campos
+        camposParcelasDiv.empty(); 
         let valorParcelaBase = totalVenda / numParcelas;
         infoValorParcelasDiv.text(`${numParcelas}x de ${formatarMoeda(valorParcelaBase)} (aprox.)`);
 
@@ -507,7 +496,7 @@ $(document).ready(function() {
         let numParcelas = parseInt(numeroParcelasSelect.val()) || 1;
         let inputsValor = camposParcelasDiv.find('.valor-parcela');
         let somaManuais = 0;
-        // Ajuste para recalcular a última parcela apenas se houver mais de uma e não for a última sendo editada
+        
         if (numParcelas > 1 && inputsValor.length === numParcelas && !$(this).is(inputsValor.last())) {
             inputsValor.each(function(index) {
                 if (index < numParcelas - 1) { 
@@ -516,7 +505,7 @@ $(document).ready(function() {
             });
             let valorUltimaParcela = totalVenda - somaManuais;
             valorUltimaParcela = Math.max(0.01, parseFloat(valorUltimaParcela.toFixed(2)));
-            // Aplica ao último input de valor
+            
             $(inputsValor[numParcelas - 1]).val(valorUltimaParcela.toFixed(2));
         }
         verificarSomaParcelas(); 
@@ -529,7 +518,6 @@ $(document).ready(function() {
             return;
         }
         if (totalVenda <= 0 && $('#campos_parcelas_editaveis .parcela-item').length > 0) { 
-             // Se o total é zero mas ainda tem campos de parcela (ex: usuário removeu todos os itens)
             avisoSomaParcelasDiv.text('O total da venda é R$0,00. As parcelas não são necessárias.').show();
             if (inicializacaoCompleta) atualizarEstadoBotaoFinalizar();
             return;
@@ -562,8 +550,8 @@ $(document).ready(function() {
         somaAtualInputs = parseFloat(somaAtualInputs.toFixed(2));
         let totalVendaArredondado = parseFloat(totalVenda.toFixed(2));
         let numParcelasAtual = $('#campos_parcelas_editaveis .parcela-item').length;
-        // A tolerância pode ser um pouco maior para evitar falsos positivos com arredondamentos múltiplos.
-        let tolerancia = 0.01 * numParcelasAtual + 0.005; // Ajuste pequeno na tolerância
+        
+        let tolerancia = 0.01 * numParcelasAtual + 0.005; 
 
         if (Math.abs(somaAtualInputs - totalVendaArredondado) > tolerancia) {
             avisoSomaParcelasDiv.text(`Soma parcelas (${formatarMoeda(somaAtualInputs)}) difere do total (${formatarMoeda(totalVendaArredondado)})! (Dif: ${formatarMoeda(Math.abs(somaAtualInputs - totalVendaArredondado))})`).show();
@@ -594,13 +582,13 @@ $(document).ready(function() {
                     $row.find('.item-subtotal-display').text(formatarMoeda(subtotal));
                 }
             } else {
-                // console.warn("Item com dados inválidos ou quantidade zero na tabela (NÃO adicionado ao array JS):", item, "Raw data:", $row.data());
+                
             }
         });
-        // console.log("Array itensVenda após leitura do DOM:", JSON.parse(JSON.stringify(itensVenda)) );
+        
 
         if (itensVenda.length === 0 && $('#tabela_itens_venda tbody tr').length > 0) {
-            // console.warn("Nenhum item válido foi encontrado na tabela para popular itensVenda, apesar de haver linhas na tabela.");
+            
         }
         if (itensVenda.length === 0) {
             $('#placeholder_itens_venda').show();
@@ -609,7 +597,6 @@ $(document).ready(function() {
         }
 
         calcularTotalVenda(); 
-        // console.log("Total da Venda após cálculo inicial:", totalVenda);
 
         if (radioParcelado.is(':checked')) {
             detalhesParcelamentoDiv.show();
@@ -623,7 +610,7 @@ $(document).ready(function() {
             if (numParcelasRenderizadasPeloBlade > 0 && numParcelasRenderizadasPeloBlade === numParcelasSelecionadoNoDropdown) {
                 console.log('Usando parcelas pré-renderizadas pelo Blade. Verificando soma.');
                 if (totalVenda > 0) {
-                     let valorParcelaBase = totalVenda / numParcelasRenderizadasPeloBlade; // Recalcula info com base no total real dos itens
+                     let valorParcelaBase = totalVenda / numParcelasRenderizadasPeloBlade; 
                      infoValorParcelasDiv.text(`${numParcelasRenderizadasPeloBlade}x de ${formatarMoeda(valorParcelaBase)} (aprox.)`);
                 } else {
                     infoValorParcelasDiv.empty();
@@ -639,7 +626,7 @@ $(document).ready(function() {
         } else { 
             console.log("Modo à vista (init).");
             detalhesParcelamentoDiv.hide();
-            camposParcelasDiv.empty(); // Se é à vista, não deve haver campos de parcela
+            camposParcelasDiv.empty(); 
             infoValorParcelasDiv.empty();
             avisoSomaParcelasDiv.hide();
         }
@@ -659,16 +646,16 @@ $(document).ready(function() {
         let errosValidacao = [];
         if (itensVenda.length === 0 || !itensVenda.some(item => (parseInt(item.quantidade) || 0) > 0)) {
             errosValidacao.push('Nenhum produto foi adicionado à venda.');
-        } else if (totalVenda <=0 && itensVenda.length > 0) { // Se tem itens mas o total é zero (ex: todos com qtd 0)
+        } else if (totalVenda <=0 && itensVenda.length > 0) { 
              errosValidacao.push('O total da venda deve ser maior que zero se houver itens.');
-        } else if (totalVenda < 0) { // Total negativo não faz sentido
+        } else if (totalVenda < 0) { 
             errosValidacao.push('O total da venda não pode ser negativo.');
         }
 
 
         if (radioParcelado.is(':checked')) {
             verificarSomaParcelas(); 
-            if (avisoSomaParcelasDiv.is(':visible') && totalVenda > 0) { // Só considera erro de soma se o total for > 0
+            if (avisoSomaParcelasDiv.is(':visible') && totalVenda > 0) { 
                 errosValidacao.push(avisoSomaParcelasDiv.text()); 
             }
             let numCamposParcela = $('#campos_parcelas_editaveis .parcela-item').length;
