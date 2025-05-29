@@ -1,4 +1,4 @@
-# Sistema de Vendas em Laravel (SistemaVendas-Laravel)
+# Sistema de Vendas em Laravel
 
 ![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue?style=for-the-badge&logo=php)
 ![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel)
