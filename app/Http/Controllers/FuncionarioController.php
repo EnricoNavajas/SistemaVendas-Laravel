@@ -13,9 +13,33 @@ use Illuminate\Support\Facades\Auth;
 class FuncionarioController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
-        $funcionarios = Funcionario::orderBy('nome', 'asc')->paginate(10);
+        $sort = $request->input('sort') ?: 'id';
+        $direction = $request->input('direction') ?: 'asc';
+
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'asc';
+        }
+
+        $query = Funcionario::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nome', 'LIKE', "%{$search}%")
+                  ->orWhere('cpf', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $funcionarios = $query->orderBy($sort, $direction)->paginate(10);
+
+        $funcionarios->appends([
+            'search' => $request->search,
+            'sort' => $sort,
+            'direction' => $direction
+        ]);
+
         return view('funcionarios.index', compact('funcionarios'));
     }
 
@@ -69,12 +93,14 @@ class FuncionarioController extends Controller
             'nome'  => 'required|string|max:255',
             'cpf'   => ['required', 'string', 'max:14', Rule::unique('funcionarios')->ignore($funcionario->id)],
             'senha' => 'nullable|string|min:8|confirmed', 
+            'ativo' => 'boolean',
         ]);
 
         try {
             $updateData = [
                 'nome' => $validatedData['nome'],
                 'cpf' => $validatedData['cpf'],
+                'ativo' => $validatedData['ativo'] ?? $funcionario->ativo,
             ];
 
             if (!empty($validatedData['senha'])) {

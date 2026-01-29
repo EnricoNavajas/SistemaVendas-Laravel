@@ -1,56 +1,134 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>{{ __('Lista de Funcionários') }}</span>
-                        <a href="{{ route('funcionarios.create') }}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-person-plus-fill me-1"></i>Novo Funcionário
-                        </a>
+        <div class="col-md-11">
+            
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-person-badge-fill me-2"></i>Lista de Funcionários</h5>
+                        </div>
+                        
+                        <div class="col-md-4 my-2 my-md-0">
+                            <form action="{{ route('funcionarios.index') }}" method="GET">
+                                <input type="hidden" name="sort" value="{{ request('sort', 'id') }}">
+                                <input type="hidden" name="direction" value="{{ request('direction', 'asc') }}">
+                                
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                                    <input type="text" name="search" class="form-control border-start-0 bg-light" 
+                                           placeholder="Pesquisar..." 
+                                           value="{{ request('search') }}">
+                                    <button class="btn btn-outline-primary" type="submit">Buscar</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ route('funcionarios.create') }}" class="btn btn-primary">
+                                <i class="bi bi-person-plus-fill me-1"></i> Novo Funcionário
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card-body">
+                <div class="card-body p-0">
                     @if($funcionarios->isEmpty())
-                        <div class="alert alert-info" role="alert">
-                            Nenhum funcionário cadastrado ainda.
+                        <div class="text-center py-5">
+                            <i class="bi bi-emoji-frown fs-1 text-muted"></i>
+                            <p class="text-muted mt-2">Nenhum funcionário encontrado.</p>
+                            @if(request('search'))
+                                <a href="{{ route('funcionarios.index') }}" class="btn btn-sm btn-outline-secondary">Limpar Filtros</a>
+                            @endif
                         </div>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead>
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
                                     <tr>
-                                        <th scope="col">ID</th>
-                                        <th scope="col">Nome</th>
-                                        <th scope="col">CPF</th>
-                                        <th scope="col">Cadastrado em</th>
-                                        <th scope="col" class="text-center">Ações</th>
+                                        <th class="ps-4" style="width: 80px;">
+                                            <a href="{{ route('funcionarios.index', ['sort' => 'id', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}" class="text-decoration-none fw-bold text-dark d-block">
+                                                ID 
+                                                @if(request('sort', 'id') == 'id')
+                                                    <i class="bi bi-arrow-{{ request('direction', 'asc') == 'asc' ? 'up' : 'down' }} text-primary"></i>
+                                                @else
+                                                    <i class="bi bi-arrow-down-up text-muted opacity-25"></i>
+                                                @endif
+                                            </a>
+                                        </th>
+
+                                        <th>
+                                            <a href="{{ route('funcionarios.index', ['sort' => 'nome', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}" class="text-decoration-none fw-bold text-dark d-block">
+                                                Nome 
+                                                @if(request('sort') == 'nome')
+                                                    <i class="bi bi-arrow-{{ request('direction') == 'asc' ? 'up' : 'down' }} text-primary"></i>
+                                                @else
+                                                    <i class="bi bi-arrow-down-up text-muted opacity-25"></i>
+                                                @endif
+                                            </a>
+                                        </th>
+
+                                        <th>
+                                            <a href="{{ route('funcionarios.index', ['sort' => 'cpf', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}" class="text-decoration-none fw-bold text-dark d-block">
+                                                CPF
+                                                @if(request('sort') == 'cpf')
+                                                    <i class="bi bi-arrow-{{ request('direction') == 'asc' ? 'up' : 'down' }} text-primary"></i>
+                                                @else
+                                                    <i class="bi bi-arrow-down-up text-muted opacity-25"></i>
+                                                @endif
+                                            </a>
+                                        </th>
+
+                                        <th>Cadastrado em</th>
+                                        
+                                        <th class="text-center">
+                                            <a href="{{ route('funcionarios.index', ['sort' => 'ativo', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}" class="text-decoration-none fw-bold text-dark d-block">
+                                                Status
+                                                @if(request('sort') == 'ativo')
+                                                    <i class="bi bi-arrow-{{ request('direction') == 'asc' ? 'up' : 'down' }} text-primary"></i>
+                                                @else
+                                                    <i class="bi bi-arrow-down-up text-muted opacity-25"></i>
+                                                @endif
+                                            </a>
+                                        </th>
+
+                                        <th class="text-center">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($funcionarios as $funcionario)
                                     <tr>
-                                        <th scope="row">{{ $funcionario->id }}</th>
-                                        <td>{{ $funcionario->nome }}</td>
-                                        <td>{{ $funcionario->cpf }}</td>
-                                        <td>{{ $funcionario->created_at->format('d/m/Y H:i') }}</td>
+                                        <td class="ps-4 fw-bold text-secondary">#{{ $funcionario->id }}</td>
+                                        <td class="fw-bold text-dark">{{ $funcionario->nome }}</td>
+                                        <td class="text-secondary">{{ $funcionario->cpf }}</td>
+                                        <td class="text-secondary">{{ $funcionario->created_at->format('d/m/Y') }}</td>
+                                        
                                         <td class="text-center">
-                                            <a href="{{ route('funcionarios.edit', $funcionario->id) }}" class="btn btn-sm btn-info me-1" title="Editar">
-                                                <i class="bi bi-pencil-square"></i> Editar
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-danger btn-delete-funcionario"
-                                                    data-funcionario-id="{{ $funcionario->id }}"
-                                                    data-funcionario-nome="{{ $funcionario->nome }}"
-                                                    title="Excluir">
-                                                <i class="bi bi-trash3"></i> Excluir
-                                            </button>
+                                            @if($funcionario->ativo)
+                                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Ativo</span>
+                                            @else
+                                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Inativo</span>
+                                            @endif
+                                        </td>
+
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ route('funcionarios.edit', $funcionario->id) }}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger btn-delete-funcionario"
+                                                        data-funcionario-id="{{ $funcionario->id }}"
+                                                        data-funcionario-nome="{{ $funcionario->nome }}"
+                                                        title="Excluir">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </div>
+                                            
                                             <form id="delete-form-funcionario-{{ $funcionario->id }}" action="{{ route('funcionarios.destroy', $funcionario->id) }}" method="POST" style="display: none;">
-                                                @csrf
-                                                @method('DELETE')
+                                                @csrf @method('DELETE')
                                             </form>
                                         </td>
                                     </tr>
@@ -58,7 +136,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="mt-3 d-flex justify-content-center">
+                        
+                        <div class="d-flex justify-content-end p-3 border-top">
                             {{ $funcionarios->links() }}
                         </div>
                     @endif
@@ -71,41 +150,30 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    if (typeof Swal === 'undefined') {
-        console.error('SweetAlert2 (Swal) não está definido. Verifique a importação em app.js.');
-        return;
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteFuncionarioButtons = document.querySelectorAll('.btn-delete-funcionario'); 
+        deleteFuncionarioButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                const funcionarioId = this.dataset.funcionarioId;
+                const funcionarioNome = this.dataset.funcionarioNome;
+                const form = document.getElementById(`delete-form-funcionario-${funcionarioId}`);
 
-    const deleteFuncionarioButtons = document.querySelectorAll('.btn-delete-funcionario');
-    deleteFuncionarioButtons.forEach(button => {
-        button.addEventListener('click', function (event) {
-            event.preventDefault();
-            const funcionarioId = this.dataset.funcionarioId;
-            const funcionarioNome = this.dataset.funcionarioNome;
-            const form = document.getElementById(`delete-form-funcionario-${funcionarioId}`);
-
-            if (!form) {
-                Swal.fire('Erro Interno!', 'Formulário de exclusão não encontrado.', 'error');
-                return;
-            }
-
-            Swal.fire({
-                title: 'Confirmar Exclusão',
-                text: `Tem certeza que deseja excluir o funcionário "${funcionarioNome}"? Esta ação não poderá ser revertida!`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sim, excluir!',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
+                Swal.fire({
+                    title: 'Tem certeza?',
+                    text: `Você vai excluir o funcionário "${funcionarioNome}".`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sim, excluir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             });
         });
     });
-});
 </script>
 @endpush
