@@ -18,6 +18,7 @@ class Funcionario extends Authenticatable
         'nome',
         'cpf',
         'senha', 
+        'ativo',
     ];
 
     

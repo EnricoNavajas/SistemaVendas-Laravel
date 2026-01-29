@@ -15,6 +15,8 @@ class Produto extends Model
     protected $fillable = [
         'nome',
         'preco',
+        'ativo',
+        'estoque',
     ];
 
     protected $casts = [

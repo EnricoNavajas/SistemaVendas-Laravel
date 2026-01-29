@@ -10,9 +10,35 @@ use Illuminate\Support\Facades\Log;
 class ClienteController extends Controller
 {
    
-    public function index()
+   public function index(Request $request)
     {
-        $clientes = Cliente::orderBy('nome', 'asc')->paginate(10);
+        $sort = $request->input('sort') ?: 'id';
+        $direction = $request->input('direction') ?: 'asc';
+
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'asc';
+        }
+
+        $query = Cliente::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nome', 'LIKE', "%{$search}%")
+                ->orWhere('cpf', 'LIKE', "%{$search}%")
+                ->orWhere('telefone', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $clientes = $query->orderBy($sort, $direction)->paginate(10);
+
+        
+        $clientes->appends([
+            'search' => $request->search,
+            'sort' => $sort,
+            'direction' => $direction
+        ]);
+
         return view('clientes.index', compact('clientes'));
     }
 
@@ -61,6 +87,7 @@ class ClienteController extends Controller
             'nome'      => 'required|string|max:255',
             'cpf'       => ['required', 'string', 'max:14', Rule::unique('clientes')->ignore($cliente->id)],
             'telefone'  => 'required|string|max:20',
+            'ativo'     => 'boolean',
         ]);
 
         try {
