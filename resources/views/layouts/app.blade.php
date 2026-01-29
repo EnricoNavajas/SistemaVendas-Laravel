@@ -123,6 +123,12 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('estoque.index') }}">
+                        <i class="bi bi-boxes"></i> Estoque
+                    </a>
+                </li>
+
+                <li>
                     <a href="#tabelasSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="bi bi-table"></i> Tabelas
                     </a>
