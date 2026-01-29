@@ -19,6 +19,8 @@ class Venda extends Model
         'cliente_id',
         'forma_pagamento',
         'total',
+        'status',           
+        'data_aprovacao'    
     ];
 
     

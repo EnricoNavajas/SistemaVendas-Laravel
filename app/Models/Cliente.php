@@ -16,6 +16,7 @@ class Cliente extends Model
         'nome',
         'cpf',
         'telefone',
+        'ativo',
     ];
 
     public function vendas(): HasMany
