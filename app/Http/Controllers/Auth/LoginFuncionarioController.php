@@ -28,8 +28,10 @@ class LoginFuncionarioController extends Controller
             'senha' => 'required|string',
         ]);
 
+        $cpf = preg_replace('/\D/', '', $request->cpf);
+
         $credentials = [
-            'cpf' => $request->cpf,
+            'cpf' => $cpf,
             'password' => $request->senha,
         ];
 
