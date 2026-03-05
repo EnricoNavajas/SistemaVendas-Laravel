@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\FuncionarioController;
+use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\VendaController;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,6 +34,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('produtos', ProdutoController::class);
     Route::resource('clientes', ClienteController::class);
     Route::resource('funcionarios', FuncionarioController::class);
+
+    Route::get('/estoque', [EstoqueController::class, 'index'])->name('estoque.index');
+    Route::patch('/estoque/{produto}', [EstoqueController::class, 'atualizar'])->name('estoque.update');
      
     Route::get('/vendas/nova', [VendaController::class, 'create'])->name('vendas.create');
     Route::post('/vendas', [VendaController::class, 'store'])->name('vendas.store');
@@ -40,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/vendas/{venda}/edit', [VendaController::class, 'edit'])->name('vendas.edit');
     Route::put('/vendas/{venda}', [VendaController::class, 'update'])->name('vendas.update');
     Route::delete('/vendas/{venda}', [VendaController::class, 'destroy'])->name('vendas.destroy');
+
 
     Route::get('vendas/{venda}/pdf', [VendaController::class, 'gerarPdf'])->name('vendas.gerarPdf');
    

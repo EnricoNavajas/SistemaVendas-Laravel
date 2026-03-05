@@ -9,10 +9,31 @@ use Illuminate\Support\Facades\Log;
 
 class ProdutoController extends Controller
 {
-        public function index()
+    public function index(Request $request)
     {
-        $produtos = Produto::orderBy('created_at', 'desc')->paginate(10);
-        return view('produtos.index', ['produtos' => $produtos]);
+        $sort = $request->input('sort') ?: 'id'; 
+        $direction = $request->input('direction') ?: 'asc';
+
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'asc';
+        }
+
+        $query = Produto::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('nome', 'LIKE', "%{$search}%");
+        }
+
+        $produtos = $query->orderBy($sort, $direction)->paginate(10);
+
+        $produtos->appends([
+            'search' => $request->search,
+            'sort' => $sort,
+            'direction' => $direction
+        ]);
+
+        return view('produtos.index', compact('produtos'));
     }
 
    
@@ -26,18 +47,16 @@ class ProdutoController extends Controller
     {
         $validatedData = $request->validate([
             'nome'  => 'required|string|max:255|unique:produtos,nome',
-            'preco' => 'required|numeric|min:0.01',
+            'preco'   => 'required|string',
+            'estoque' => 'required|integer|min:0',
         ]);
 
-        try {
-            Produto::create($validatedData);
-            return redirect()->route('produtos.index')
-                             ->with('success', 'Produto cadastrado com sucesso!');
-        } catch (\Exception $e) {
-            Log::error('Erro ao cadastrar produto: ' . $e->getMessage());  
-            return redirect()->route('produtos.create')
-                             ->with('error', 'Erro ao cadastrar o produto. Tente novamente.');
-        }
+        $validatedData['ativo'] = true;
+
+       Produto::create($validatedData);
+
+        return redirect()->route('produtos.index')
+                         ->with('success', 'Produto cadastrado com sucesso!');
     }
 
     public function show(Produto $produto)
@@ -52,34 +71,19 @@ class ProdutoController extends Controller
         return view('produtos.edit', compact('produto'));
     }
 
-       public function update(Request $request, Produto $produto) 
+       public function update(Request $request, Produto $produto)
     {
-      
         $validatedData = $request->validate([
-            'nome'  => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('produtos')->ignore($produto->id), 
-            ],
-            'preco' => 'required|numeric|min:0.01',
+            'nome'    => 'required|string|max:255',
+            'preco'   => 'required|string',
+            'estoque' => 'required|integer|min:0',
+            'ativo'   => 'boolean',
         ]);
+        
+        $produto->update($validatedData);
 
-       
-        try {
-            $produto->update([ 
-                'nome' => $validatedData['nome'],
-                'preco' => $validatedData['preco'],
-            ]);
-
-            return redirect()->route('produtos.index')
-                             ->with('success', "Produto '{$produto->nome}' atualizado com sucesso!");
-
-        } catch (\Exception $e) {
-            Log::error('Erro ao atualizar produto (ID: ' . $produto->id . '): ' . $e->getMessage());
-            return redirect()->route('produtos.edit', $produto->id) 
-                             ->with('error', 'Erro ao atualizar o produto. Tente novamente.');
-        }
+        return redirect()->route('produtos.index')
+                         ->with('success', 'Produto atualizado com sucesso!');
     }
 
    
