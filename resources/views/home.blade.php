@@ -171,47 +171,69 @@
     
     <div class="row g-4 mt-1">
         <div class="col-12">
-            <div class="card card-dashboard">
+            <div class="card card-dashboard h-100">
                 <div class="card-header bg-white border-bottom-0 py-3">
-                    <h6 class="fw-bold mb-0">Produtos Mais Vendidos (Exemplo Visual)</h6>
+                    <h6 class="fw-bold mb-0">Produtos Mais Vendidos</h6>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0"> {{-- p-0 para alinhar as bordas com o card --}}
                     <div class="table-responsive">
                         <table class="table table-borderless align-middle mb-0">
-                            <thead>
+                            <thead class="bg-light">
                                 <tr class="text-muted small text-uppercase">
-                                    <th>Produto</th>
-                                    <th>Preço</th>
-                                    <th>Vendas</th>
-                                    <th>Status</th>
+                                    <th class="px-4 py-3">Produto</th>
+                                    <th class="text-center py-3">Preço Unit.</th>
+                                    <th class="text-center py-3">Qtd. Vendida</th>
+                                    <th class="text-center py-3">Estoque</th>
+                                    <th class="text-end px-4 py-3">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-bottom">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded p-2 me-2"><i class="bi bi-box"></i></div>
-                                            <span class="fw-bold">Exemplo: Teclado Mecânico</span>
-                                        </div>
-                                    </td>
-                                    <td>R$ 150,00</td>
-                                    <td>42</td>
-                                    <td><span class="badge bg-success bg-opacity-10 text-success">Em Estoque</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded p-2 me-2"><i class="bi bi-mouse"></i></div>
-                                            <span class="fw-bold">Exemplo: Mouse Gamer</span>
-                                        </div>
-                                    </td>
-                                    <td>R$ 89,90</td>
-                                    <td>28</td>
-                                    <td><span class="badge bg-warning bg-opacity-10 text-warning">Poucas Unidades</span></td>
-                                </tr>
+                                @forelse($produtosMaisVendidos as $produto)
+                                    <tr class="border-bottom" style="border-color: #f8f9fa !important;">
+                                        <td class="px-4 py-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded p-2 me-3 text-primary">
+                                                    <i class="bi bi-tag"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="d-block fw-bold text-dark">{{ $produto->nome }}</span>
+                                                    <small class="text-muted" style="font-size: 0.8em;">ID: #{{ $produto->id }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center py-3 text-dark fw-medium">
+                                            R$ {{ number_format($produto->preco, 2, ',', '.') }}
+                                        </td>
+                                        <td class="text-center py-3">
+                                            <span class="fw-bold text-dark">{{ $produto->total_vendido }} un.</span>
+                                        </td>
+                                        <td class="text-center py-3 text-muted">
+                                            {{ $produto->estoque }}
+                                        </td>
+                                        <td class="text-end px-4 py-3">
+                                            @if($produto->estoque <= 0)
+                                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill" style="font-size: 0.75rem;">Esgotado</span>
+                                            @elseif($produto->estoque <= 10)
+                                                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill" style="font-size: 0.75rem;">Baixo Estoque</span>
+                                            @else
+                                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill" style="font-size: 0.75rem;">Ativo</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5 text-muted">
+                                            <i class="bi bi-box fs-1 d-block mb-2"></i>
+                                            Nenhum produto vendido ainda.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+                </div>
+                <div class="card-footer bg-white border-0 text-center py-3">
+                    <a href="{{ route('produtos.index') }}" class="text-decoration-none fw-bold" style="font-size: 0.9rem;">Ver Todos os Produtos</a>
                 </div>
             </div>
         </div>

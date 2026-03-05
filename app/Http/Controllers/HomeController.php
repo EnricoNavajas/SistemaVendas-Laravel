@@ -43,6 +43,18 @@ class HomeController extends Controller
         $dataGrafico   = $graficoVendas->pluck('total');
 
         $recents = Venda::with('cliente')->latest()->take(5)->get();
+
+        $produtosMaisVendidos = Produto::select(
+            'produtos.nome', 
+            'produtos.preco', 
+            'produtos.estoque',
+            DB::raw('SUM(venda_itens.quantidade) as total_vendido')
+        )
+        ->join('venda_itens', 'produtos.id', '=', 'venda_itens.produto_id')
+        ->groupBy('produtos.id', 'produtos.nome', 'produtos.preco', 'produtos.estoque')
+        ->orderByDesc('total_vendido')
+        ->take(5)
+        ->get();
         
         $produtosBaixoEstoque = 0; 
 
@@ -51,7 +63,7 @@ class HomeController extends Controller
             'vendasMes', 'fatMes', 
             'ticketMedio', 'totalClientes',
             'labelsGrafico', 'dataGrafico',
-            'recents', 'produtosBaixoEstoque'
+            'recents', 'produtosBaixoEstoque', 'produtosMaisVendidos'
         ));
     }
 }
